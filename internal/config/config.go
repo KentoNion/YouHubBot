@@ -10,6 +10,11 @@ type Config struct {
 	TeleApiKey string `yaml:"tele_api_key" env-required:"true"`
 	YtApiKey   string `yaml:"yt_api_key" env-required:"true"`
 	ConfigPath string `yaml:"config_path"`
+	DbUser     string `yaml:"db_user" env-required:"true"`
+	DbPass     string `yaml:"db_pass" env-required:"true"`
+	DbHost     string `yaml:"db_host" env-required:"true"`
+	DbPort     string `yaml:"db_port"`
+	DbSsl      string `yaml:"db_ssl" env-required:"true"`
 }
 
 func MustLoad() (*Config, error) {

@@ -1,0 +1,12 @@
+env: "local" # local, dev, prod
+telegram:
+  tele_api_key: ""
+youtube:
+  yt_api_key: ""
+logger:
+  logger_file_path: "" #keep empty for no log file
+postgress_db:
+  user: ""
+  password: ""
+  host: "" #ignored if used by docker
+  sslmode: ""

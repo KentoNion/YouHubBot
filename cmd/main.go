@@ -5,11 +5,13 @@ import (
 	"YoutHubBot/gates/telegram"
 	"YoutHubBot/internal/config"
 	"context"
+	"fmt"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" //драйвер postgres
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"gopkg.in/telebot.v3"
+	"os"
 	"time"
 )
 
@@ -23,6 +25,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:       Cfg.TeleApiKey,
 		Synchronous: true,
@@ -37,12 +40,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	conn, err := sqlx.Connect("postgres", "youtube_hub_bot.db") //драйвер и имя бд
+
+	dbhost := os.Getenv("DB_HOST") // получение значение DB_HOST из среды, значение среды todo: прописать значение среды в docker-compose
+	if dbhost == "" {
+		dbhost = Cfg.DbHost
+	}
+	//подключение к дб
+	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DbUser, Cfg.DbPass, dbhost, Cfg.DbSsl)
+	conn, err := sqlx.Connect("postgres", connstr) //драйвер и имя бд
 	if err != nil {
 		zap.Error(errors.Wrap(err, "failed to connect to database"))
 		panic(err)
 	}
-	db := postgres.NewDB(conn) //подключение бд
+	db := postgres.NewDB(conn)
 
 	opts := &telegram.Opts{
 		Log: log.With(zap.String("component", "telegram")),

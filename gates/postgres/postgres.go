@@ -15,7 +15,6 @@ type DB struct {
 func NewDB(db *sqlx.DB) *DB {
 	return &DB{
 		db: db,
-		sq: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		sm: sqluct.Mapper{Dialect: sqluct.DialectSQLite3},
+		sm: sqluct.Mapper{Dialect: sqluct.DialectPostgres},
 	}
 }
