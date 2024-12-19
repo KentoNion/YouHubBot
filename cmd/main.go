@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" //драйвер postgres
 	"github.com/pkg/errors"
+	goose "github.com/pressly/goose/v3"
 	"go.uber.org/zap"
 	"gopkg.in/telebot.v3"
 	"os"
@@ -53,6 +54,11 @@ func main() {
 		panic(err)
 	}
 	db := postgres.NewDB(conn)
+	//накатываем миграцию
+	err = goose.Up(conn.DB, "./gates\\postgres\\migrations")
+	if err != nil {
+		panic(err)
+	}
 
 	opts := &telegram.Opts{
 		Log: log.With(zap.String("component", "telegram")),
