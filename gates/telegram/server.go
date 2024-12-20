@@ -1,11 +1,11 @@
 package telegram
 
 import (
+	"YoutHubBot/cases"
 	"YoutHubBot/domain"
 	"fmt"
 	"go.uber.org/zap"
 	tele "gopkg.in/telebot.v3"
-	"strings"
 )
 
 type Client struct {
@@ -23,19 +23,29 @@ func NewClient(cli *tele.Bot, opts *Opts) *Client {
 		cli: cli,
 		log: opts.Log,
 	}
-	cli.Handle(tele.OnText, svc.addReuploadChannel())
-	cli.Handle("/addchanel", svc.addReuploadChannel())
+	cli.Handle(tele.OnText, svc.AddReuploadChannel())
+	cli.Handle("/addchanel", svc.AddReuploadChannel)
 	return svc
 }
 
-func (c *Client) addReuploadChannel(msg string) func(msg tele.Context) error {
+func (c *Client) AddReuploadChannel() func(msg tele.Context) {
 	return func(msg tele.Context) error {
-		links := strings.Split(msg)
-		if len(links) != 2 {
-			msg.Reply(fmt.Sprintf("Ввести нужно 2 ссылки, ссылку на YouTube/VK + TG чат/канал куда будет осуществляться презалив"))
-			return nil
+		info := msg.Args()
+		if len(info) != 3 {
+			msg.Reply(fmt.Sprintf("Ввести нужно название канала и 2 ссылки, ссылку на YouTube/VK + TG чат/канал куда будет осуществляться презалив"))
 		}
-		sourceLink, tgChanLink := links[0], links[1]
+		var channel domain.TgChan{
+			name: info[0],
+			link: info[1],
+			sourceChanLink: info[2]
+		}
 		//todo нужно как то проверить может ли бот писать в чат по ссылке
+		err := cases.Subscrube(channel)
+		if err != nil {
+			msg.Reply(fmt.Sprint("Произошла ошибка"))
+			c.log.Error(err)
+			return err
+		}
+		return nil
 	}
 }
