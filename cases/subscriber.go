@@ -1,7 +1,3 @@
 package cases
 
-import(
-
-	)
-
-func Subscribe
+func Subscribe()

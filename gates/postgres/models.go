@@ -5,7 +5,7 @@ import (
 )
 
 type TgChan struct {
-	name           string
-	link           domain.Link
-	sourceChanLink domain.Link
+	Name           string
+	Link           domain.Link
+	SourceChanLink domain.Link
 }

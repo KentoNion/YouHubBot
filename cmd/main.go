@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 	goose "github.com/pressly/goose/v3"
 	"go.uber.org/zap"
-	"gopkg.in/telebot.v3"
+	telebot "gopkg.in/telebot.v3"
 	"os"
 	"time"
 )
