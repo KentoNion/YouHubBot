@@ -4,6 +4,7 @@ import (
 	"YoutHubBot/gates/postgres"
 	"YoutHubBot/gates/telegram"
 	"YoutHubBot/internal/config"
+	"YoutHubBot/internal/logger"
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -17,23 +18,25 @@ import (
 )
 
 func main() {
-	Cfg, err := config.MustLoad() // ипортируем конфиг
+	//читаем конфиг
+	Cfg, err := config.MustLoad()
 	if err != nil {
 		panic(err)
 	}
 
-	log, err := zap.NewDevelopment() //регестрируем логгер
+	//регестрируем логгер
+	log, err := logger.InitLogger(Cfg)
 	if err != nil {
 		panic(err)
 	}
 
 	bot, err := telebot.NewBot(telebot.Settings{
-		Token:       Cfg.TeleApiKey,
+		Token:       Cfg.APIKeys.TeleApiKey,
 		Synchronous: true,
 		Verbose:     false,
 		OnError: func(err error, msg telebot.Context) {
 			if err != nil {
-				log.Error("failed to send message", zap.Error(err))
+				log.Error("failed to send message", err)
 			}
 		},
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
@@ -44,10 +47,10 @@ func main() {
 
 	dbhost := os.Getenv("DB_HOST") // получение значение DB_HOST из среды, значение среды todo: прописать значение среды в docker-compose
 	if dbhost == "" {
-		dbhost = Cfg.DbHost
+		dbhost = Cfg.DB.DbHost
 	}
 	//подключение к дб
-	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DbUser, Cfg.DbPass, dbhost, Cfg.DbSsl)
+	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DB.DbUser, Cfg.DB.DbPass, dbhost, Cfg.DB.DbSsl)
 	conn, err := sqlx.Connect("postgres", connstr) //драйвер и имя бд
 	if err != nil {
 		zap.Error(errors.Wrap(err, "failed to connect to database"))
@@ -61,7 +64,7 @@ func main() {
 	}
 
 	opts := &telegram.Opts{
-		Log: log.With(zap.String("component", "telegram")),
+		Log: nil, //todo fix
 	}
 	client := telegram.NewClient(bot, opts)
 

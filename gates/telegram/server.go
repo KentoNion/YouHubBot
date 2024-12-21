@@ -22,7 +22,7 @@ type user struct {
 	domain.UserID
 }
 
-func (u *user) NewClient(cli *tele.Bot, opts *Opts) *Client {
+func NewClient(cli *tele.Bot, opts *Opts) *Client {
 	svc := &Client{
 		cli: cli,
 		log: opts.Log,

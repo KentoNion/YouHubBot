@@ -3,38 +3,43 @@ package logger
 import (
 	"YoutHubBot/internal/config"
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"io"
+	"log/slog"
 	"os"
 )
 
-func InitLogger(cfg *config.Config) (*zap.Logger, error) {
-	// Конфигурация в файл
-	Encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
 
-	// Открываем/создаём файл для логирования
-	// Создаем core для вывода в консоль
-	consoleCore := zapcore.NewCore(
-		Encoder,
-		zapcore.AddSync(os.Stdout), // Выводим в стандартный вывод (терминал)
-		zapcore.DebugLevel,
-	)
-	core := zapcore.NewTee(consoleCore)
-
-	if cfg.ConfigPath != "" { //если передан параметр пути до файлов с логами, то добавляем в core этот файл
-		logFile, err := os.OpenFile(cfg.ConfigPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func InitLogger(cfg *config.Config) (*slog.Logger, error) {
+	var logFile *os.File
+	var err error
+	if cfg.Log.ConfigPath != "" { //Если строка в конфиге пустая, это будет означать что нам не нужно сохранение логов в файл
+		logFile, err = os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open or create log file: %w", err)
+			fmt.Printf("error opening file: %v", err)
+			return nil, err
 		}
-		// Вывод в файл
-		fileCore := zapcore.NewCore(
-			Encoder,
-			zapcore.AddSync(logFile), // Выводим в лог-файл
-			zapcore.DebugLevel,
-		)
-		core = zapcore.NewTee(consoleCore, fileCore)
 	}
 
-	logger := zap.New(core)
-	return logger, nil
+	var log *slog.Logger
+
+	switch cfg.Env {
+	case envLocal:
+		if cfg.Log.ConfigPath == "" {
+			log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			return log, nil
+		}
+		log = slog.New(slog.NewTextHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case envProd:
+		if cfg.Log.ConfigPath == "" {
+			log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+			return log, nil
+		}
+		log = slog.New(slog.NewJSONHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
+	return log, nil
 }
