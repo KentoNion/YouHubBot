@@ -1,4 +1,4 @@
-package postgres
+package storage
 
 import (
 	"YoutHubBot/domain"
@@ -27,7 +27,7 @@ func NewDB(db *sqlx.DB) *DB {
 // Пытается получить админа по userID
 func (p *DB) GetAdmin(ctx context.Context, userID domain.UserID) (domain.Admin, error) {
 	const op = "gates.postgres.GetAdmin"
-	query := p.sm.Select(p.sq.Select(), &Admin{}).
+	query := p.sm.Select(p.sq.Select(), &admin{}).
 		From("admins").
 		Where(sq.Eq{"user_id": userID})
 	qry, args, err := query.ToSql()
@@ -46,7 +46,7 @@ func (p *DB) GetAdmin(ctx context.Context, userID domain.UserID) (domain.Admin, 
 }
 
 // пытается добавить источник фида по структуре Source
-func (p *DB) AddTGSource(ctx context.Context, source Source) error {
+func (p *DB) AddTGSource(ctx context.Context, source source) error {
 	const op = "gates.postgres.AddTGSource"
 	query := p.sm.Insert(p.sq.Insert("tg_sources"), source, sqluct.InsertIgnore)
 	qry, args, err := query.ToSql()
@@ -82,14 +82,14 @@ func (p *DB) DeleteTGSource(ctx context.Context, name string) error {
 }
 
 // Отдаёт список источников сохранённых в бд
-func (p *DB) GetSources(ctx context.Context) ([]Source, error) {
+func (p *DB) GetSources(ctx context.Context) ([]source, error) {
 	const op = "gates.postgres.GetSources"
-	query := p.sm.Select(p.sq.Select(), &Source{}).From("tg_sources")
+	query := p.sm.Select(p.sq.Select(), &source{}).From("tg_sources")
 	qry, args, err := query.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("#{op}: #{err}")
 	}
-	var sources []Source
+	var sources []source
 	err = p.db.SelectContext(ctx, &sources, qry, args...)
 	if err != nil {
 		return nil, fmt.Errorf("#{op}: #{err}")

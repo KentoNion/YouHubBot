@@ -55,7 +55,7 @@ func main() {
 	db := postgres.NewDB(conn)
 
 	//накатываем миграцию
-	err = goose.Up(conn.DB, "./gates\\postgres\\migrations")
+	err = goose.Up(conn.DB, "./gates\\storage\\migrations")
 	if err != nil {
 		panic(err)
 	}
@@ -66,6 +66,5 @@ func main() {
 	client := telegram.NewClient(bot, opts)
 
 	ctx := context.Background() //контекст
-	_ = client
-	_ = ctx
+
 }
