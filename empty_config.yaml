@@ -1,7 +1,6 @@
-env: "local" # local, dev, prod
-telegram:
+env: "local" # local, prod
+API_keys:
   tele_api_key: ""
-youtube:
   yt_api_key: ""
 logger:
   logger_file_path: "" #keep empty for no log file

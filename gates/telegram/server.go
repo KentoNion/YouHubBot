@@ -58,7 +58,7 @@ func (c *Client) addReuploadChannel(msg tele.Context) error {
 		return err
 	}
 
-	channel := domain.TgChan{
+	channel := domain.Source{
 		Name:           channelName,
 		Link:           channelLink,
 		SourceChanLink: sourceLink,
