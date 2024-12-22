@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
@@ -9,10 +8,10 @@ import (
 
 type DB struct {
 	DbUser string `yaml:"db_user" env-required:"true"`
-	DbPass string `yaml:"db_pass" env-required:"true"`
+	DbPass string `yaml:"db_password" env-required:"true"`
 	DbHost string `yaml:"db_host" env-required:"true"`
 	DbPort string `yaml:"db_port"`
-	DbSsl  string `yaml:"db_ssl" env-required:"true"`
+	DbSsl  string `yaml:"db_sslmode" env-required:"true"`
 }
 
 type APIKeys struct {
@@ -21,20 +20,20 @@ type APIKeys struct {
 }
 
 type Log struct {
-	ConfigPath string `yaml:"config_path"`
+	FilePath string `yaml:"logger_file_path"`
 }
 
 type Config struct {
-	Env     string `yaml:"env"`
-	DB      DB
-	APIKeys APIKeys
-	Log     Log
+	Env     string  `yaml:"env"`
+	DB      DB      `yaml:"postgres_db"`
+	APIKeys APIKeys `yaml:"API_keys"`
+	Log     Log     `yaml:"logger"`
 }
 
 func MustLoad() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		configPath = "./config.yaml"
+		configPath = "../config.yaml"
 	}
 
 	//проверка существует ли файл
@@ -46,7 +45,7 @@ func MustLoad() *Config {
 
 	err := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {
-		log.Fatal(fmt.Errorf("cannot read config file", err))
+		log.Fatal(err)
 	}
 	return &cfg
 }

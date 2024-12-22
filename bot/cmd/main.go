@@ -1,11 +1,10 @@
 package main
 
 import (
-	"YoutHubBot/gates/postgres"
+	storage "YoutHubBot/gates/storage/postgres"
 	"YoutHubBot/gates/telegram"
 	"YoutHubBot/internal/config"
 	"YoutHubBot/internal/logger"
-	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" //драйвер postgres
@@ -23,6 +22,8 @@ func main() {
 
 	//регестрируем логгер
 	log := logger.MustInitLogger(Cfg)
+	log.Info("starting YoutHubBot")
+	log.Debug("debug messages are enabled")
 
 	//регестрируем бота
 	bot, err := telebot.NewBot(telebot.Settings{
@@ -52,7 +53,7 @@ func main() {
 		zap.Error(errors.Wrap(err, "failed to connect to database"))
 		panic(err)
 	}
-	db := postgres.NewDB(conn)
+	db := storage.NewDB(conn)
 
 	//накатываем миграцию
 	err = goose.Up(conn.DB, "./gates\\storage\\migrations")
@@ -64,7 +65,5 @@ func main() {
 		Log: nil, //todo fix
 	}
 	client := telegram.NewClient(bot, opts)
-
-	ctx := context.Background() //контекст
 
 }

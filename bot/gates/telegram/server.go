@@ -64,7 +64,7 @@ func (c *Client) addReuploadChannel(msg tele.Context) error {
 		SourceChanLink: sourceLink,
 	}
 	//todo нужно как то проверить может ли бот писать в чат по ссылке
-	err := cases.Subscrube(channel)
+	cases.Subscrube(channel)
 	if err != nil {
 		msg.Reply(fmt.Sprint("Произошла ошибка"))
 		c.log.Error(err)

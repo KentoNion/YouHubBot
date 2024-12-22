@@ -1,3 +1,5 @@
 package cases
 
-func Subscribe()
+func Subscribe() {
+
+}
