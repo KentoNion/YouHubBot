@@ -27,12 +27,19 @@ func NewClient(cli *tele.Bot, opts *Opts) *Client {
 		cli: cli,
 		log: opts.Log,
 	}
-	cli.Handle(tele.OnText, svc.AddReuploadChannel)
-	cli.Handle("/addchanel", svc.AddReuploadChannel)
+	cli.Handle(tele.OnText, svc.addReuploadChannel)
+	cli.Handle("/addchanel", svc.addReuploadChannel)
 	return svc
 }
 
-func (c *Client) AddReuploadChannel(msg tele.Context) error {
+func (с *Client) hello(msg tele.Context) error {
+	helloMessage := fmt.Sprintf("Wellcome to YouTube Hub Bot \n you may use this bot only if youre admin at this moment \n I have plans for the future to add limited permissions to download videos via dirrect messages to this bot in the future")
+	msg.Reply(helloMessage)
+	userId := msg.Sender().ID
+	return nil
+}
+
+func (c *Client) addReuploadChannel(msg tele.Context) error {
 	info := msg.Args()
 	if len(info) != 3 {
 		msg.Reply(fmt.Sprintf("Ввести нужно название канала и 2 ссылки, ссылку на YouTube/VK + TG чат/канал куда будет осуществляться презалив"))

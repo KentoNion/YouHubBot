@@ -19,17 +19,12 @@ import (
 
 func main() {
 	//читаем конфиг
-	Cfg, err := config.MustLoad()
-	if err != nil {
-		panic(err)
-	}
+	Cfg := config.MustLoad()
 
 	//регестрируем логгер
-	log, err := logger.InitLogger(Cfg)
-	if err != nil {
-		panic(err)
-	}
+	log := logger.MustInitLogger(Cfg)
 
+	//регестрируем бота
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:       Cfg.APIKeys.TeleApiKey,
 		Synchronous: true,
@@ -45,7 +40,8 @@ func main() {
 		panic(err)
 	}
 
-	dbhost := os.Getenv("DB_HOST") // получение значение DB_HOST из среды, значение среды todo: прописать значение среды в docker-compose
+	// получение значение DB_HOST из среды, значение среды todo: прописать значение среды в docker-compose
+	dbhost := os.Getenv("DB_HOST")
 	if dbhost == "" {
 		dbhost = Cfg.DB.DbHost
 	}
@@ -57,6 +53,7 @@ func main() {
 		panic(err)
 	}
 	db := postgres.NewDB(conn)
+
 	//накатываем миграцию
 	err = goose.Up(conn.DB, "./gates\\postgres\\migrations")
 	if err != nil {
@@ -69,4 +66,6 @@ func main() {
 	client := telegram.NewClient(bot, opts)
 
 	ctx := context.Background() //контекст
+	_ = client
+	_ = ctx
 }

@@ -1,8 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/pkg/errors"
+	"log"
 	"os"
 )
 
@@ -30,7 +31,7 @@ type Config struct {
 	Log     Log
 }
 
-func MustLoad() (*Config, error) {
+func MustLoad() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "./config.yaml"
@@ -38,15 +39,14 @@ func MustLoad() (*Config, error) {
 
 	//проверка существует ли файл
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, errors.Wrapf(err, "config file not found at %s", configPath)
+		log.Fatal("cannot read config file")
 	}
 
 	var cfg Config
 
 	err := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot read config file")
+		log.Fatal(fmt.Errorf("cannot read config file", err))
 	}
-
-	return &cfg, nil
+	return &cfg
 }
