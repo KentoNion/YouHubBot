@@ -7,20 +7,20 @@ import (
 )
 
 type DB struct {
-	DbUser string `yaml:"db_user" env-required:"true"`
-	DbPass string `yaml:"db_password" env-required:"true"`
-	DbHost string `yaml:"db_host" env-required:"true"`
-	DbPort string `yaml:"db_port"`
-	DbSsl  string `yaml:"db_sslmode" env-required:"true"`
+	User string `yaml:"user" env-required:"true"`
+	Pass string `yaml:"password" env-required:"true"`
+	Host string `yaml:"host" env-required:"true"`
+	Port string `yaml:"port"`
+	Ssl  string `yaml:"sslmode" env-required:"true"`
 }
 
 type APIKeys struct {
-	TeleApiKey string `yaml:"tele_api_key" env-required:"true"`
-	YtApiKey   string `yaml:"yt_api_key" env-required:"true"`
+	Telegram string `yaml:"telegram" env-required:"true"`
+	Youtube  string `yaml:"youtube" env-required:"true"`
 }
 
 type Log struct {
-	FilePath string `yaml:"logger_file_path"`
+	FilePath string `yaml:"file_path"`
 }
 
 type Config struct {

@@ -3,6 +3,7 @@ package domain
 import (
 	"github.com/pkg/errors"
 	"strings"
+	"time"
 )
 
 type UserID string
@@ -47,4 +48,14 @@ func VerifySourceLink(link Link) error {
 		return nil
 	}
 	return errors.New("Wrong link format, does not contain link")
+}
+
+type Post struct {
+	postID         int
+	tgChanName     string
+	title          string
+	postSourceLink Link
+	publishedAt    time.Time
+	createdAt      time.Time
+	postedAt       time.Time
 }

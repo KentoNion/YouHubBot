@@ -1,11 +1,12 @@
 env: "local" # local, prod
 API_keys:
-  tele_api_key: ""
-  yt_api_key: ""
+  telegram: ""
+  youtube: ""
 logger:
-  logger_file_path: "" #keep empty for no log file
-postgress_db:
+  file_path: "../logs.txt" #keep empty for no log file
+postgres_db:
   user: ""
   password: ""
   host: "" #ignored if used by docker
   sslmode: ""
+  port: ""

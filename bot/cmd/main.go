@@ -1,7 +1,7 @@
 package main
 
 import (
-	storage "YoutHubBot/gates/storage/postgres"
+	"YoutHubBot/gates/storage"
 	"YoutHubBot/gates/telegram"
 	"YoutHubBot/internal/config"
 	"YoutHubBot/internal/logger"
@@ -27,7 +27,7 @@ func main() {
 
 	//регестрируем бота
 	bot, err := telebot.NewBot(telebot.Settings{
-		Token:       Cfg.APIKeys.TeleApiKey,
+		Token:       Cfg.APIKeys.Telegram,
 		Synchronous: true,
 		Verbose:     false,
 		OnError: func(err error, msg telebot.Context) {
@@ -44,10 +44,10 @@ func main() {
 	// получение значение DB_HOST из среды, значение среды todo: прописать значение среды в docker-compose
 	dbhost := os.Getenv("DB_HOST")
 	if dbhost == "" {
-		dbhost = Cfg.DB.DbHost
+		dbhost = Cfg.DB.Host
 	}
 	//подключение к дб
-	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DB.DbUser, Cfg.DB.DbPass, dbhost, Cfg.DB.DbSsl)
+	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DB.User, Cfg.DB.DbPass, dbhost, Cfg.DB.DbSsl)
 	conn, err := sqlx.Connect("postgres", connstr) //драйвер и имя бд
 	if err != nil {
 		zap.Error(errors.Wrap(err, "failed to connect to database"))
