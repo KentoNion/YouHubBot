@@ -47,13 +47,13 @@ func main() {
 		dbhost = Cfg.DB.Host
 	}
 	//подключение к дб
-	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DB.User, Cfg.DB.DbPass, dbhost, Cfg.DB.DbSsl)
+	connstr := fmt.Sprintf("user=%s password=%s dbname=youtube_hub_bot host=%s sslmode=%s", Cfg.DB.User, Cfg.DB.Pass, dbhost, Cfg.DB.Ssl)
 	conn, err := sqlx.Connect("postgres", connstr) //драйвер и имя бд
 	if err != nil {
 		zap.Error(errors.Wrap(err, "failed to connect to database"))
 		panic(err)
 	}
-	db := storage.NewDB(conn)
+	db := storage.NewDB(conn, log)
 
 	//накатываем миграцию
 	err = goose.Up(conn.DB, "./gates\\storage\\migrations")
